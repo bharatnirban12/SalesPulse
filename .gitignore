@@ -37,18 +37,6 @@ venv.bak/
 .env
 .env.local
 
-# Data / Models (Add specific files to ignore large raw data or trained models if needed)
-data/
-*.csv
-*.parquet
-*.json
-*.pkl
-*.h5
-*.hdf5
-models/
-*.joblib
-*.pt
-
 # Streamlit
 .streamlit/
 !/.streamlit/config.toml
@@ -67,3 +55,8 @@ models/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+data/raw/train.csv
+data/processed/clean_data.csv
+data/processed/merged_data.csv
+data/processed/featured_data.csv
