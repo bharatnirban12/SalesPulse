@@ -1,0 +1,7 @@
+sparse_threshold: 0.7
+
+sparse_categories:
+  - BOOKS
+  - BABY CARE
+  - SCHOOL AND OFFICE SUPPLIES
+  - HOME APPLIANCES
