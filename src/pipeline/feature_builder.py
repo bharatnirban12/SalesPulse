@@ -4,7 +4,7 @@ import numpy as np
 
 class FeatureBuilder:
     def __init__(self):
-        self.data_path = "data/processed/featured_data.csv"
+        self.data_path = "data/processed/featured_data.csv.zip"
         self.df = pd.read_csv(self.data_path)
         self.df["date"] = pd.to_datetime(self.df["date"])
         self.global_min_date = self.df["date"].min()

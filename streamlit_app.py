@@ -709,7 +709,7 @@ def load_forecast_data():
 @st.cache_data(ttl=600)
 def load_training_data_sample():
     try:
-        df = pd.read_csv(f"{API_BASE_URL}/data/training", nrows=50000)
+        df = pd.read_csv(f"{API_BASE_URL}/data/training", nrows=50000, compression="zip")
         df["date"] = pd.to_datetime(df["date"])
         return df
     except Exception as e:

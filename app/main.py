@@ -107,9 +107,9 @@ def get_forecast_data():
 
 @app.get("/api/data/training")
 def get_training_data():
-    file_path = "data/processed/featured_data.csv"
+    file_path = "data/processed/featured_data.csv.zip"
     if os.path.exists(file_path):
-        return FileResponse(file_path, media_type="text/csv")
+        return FileResponse(file_path, media_type="application/zip")
     return JSONResponse(status_code=404, content={"error": "File not found"})
 
 @app.get("/api/data/stores")
