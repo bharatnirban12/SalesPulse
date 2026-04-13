@@ -27,3 +27,8 @@ tqdm==4.66.1
 streamlit>=1.30.0
 plotly>=5.18.0
 pyyaml>=6.0
+
+# API Backend & Networking
+fastapi>=0.100.0
+uvicorn>=0.23.0
+requests>=2.31.0

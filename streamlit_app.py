@@ -9,6 +9,9 @@ import numpy as np
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import yaml
+import requests
+
+API_BASE_URL = "http://127.0.0.1:8000/api"
 
 # ──────────────────────────────────────────
 # PAGE CONFIG
@@ -695,7 +698,7 @@ st.markdown("""
 @st.cache_data(ttl=600)
 def load_forecast_data():
     try:
-        df = pd.read_csv("data/processed/forecast_output.csv")
+        df = pd.read_csv(f"{API_BASE_URL}/data/forecast")
         df["date"] = pd.to_datetime(df["date"])
         return df
     except Exception as e:
@@ -706,7 +709,7 @@ def load_forecast_data():
 @st.cache_data(ttl=600)
 def load_training_data_sample():
     try:
-        df = pd.read_csv("data/processed/featured_data.csv", nrows=50000)
+        df = pd.read_csv(f"{API_BASE_URL}/data/training", nrows=50000)
         df["date"] = pd.to_datetime(df["date"])
         return df
     except Exception as e:
@@ -717,7 +720,7 @@ def load_training_data_sample():
 @st.cache_data(ttl=600)
 def load_stores_data():
     try:
-        return pd.read_csv("data/raw/stores.csv")
+        return pd.read_csv(f"{API_BASE_URL}/data/stores")
     except Exception:
         return pd.DataFrame()
 
@@ -725,8 +728,10 @@ def load_stores_data():
 @st.cache_data(ttl=600)
 def load_config():
     try:
-        with open("src/config/config.yaml", "r") as f:
-            return yaml.safe_load(f)
+        res = requests.get(f"{API_BASE_URL}/config")
+        if res.status_code == 200:
+            return res.json()
+        return {"sparse_categories": [], "sparse_threshold": 0.7}
     except Exception:
         return {"sparse_categories": [], "sparse_threshold": 0.7}
 
@@ -1776,13 +1781,13 @@ with tab_model:
     """, unsafe_allow_html=True)
 
     model_files = []
-    if os.path.exists("models"):
-        for f in os.listdir("models"):
-            fp = os.path.join("models", f)
-            if os.path.isfile(fp):
-                size_kb  = os.path.getsize(fp) / 1024
-                m_type   = "Sparse Pipeline" if "sparse" in f.lower() else "Dense XGBoost"
-                model_files.append({"File": f, "Size": f"{size_kb:,.1f} KB", "Type": m_type})
+    try:
+        res = requests.get(f"{API_BASE_URL}/models")
+        if res.status_code == 200:
+            model_files = res.json()
+    except:
+        pass
+        
     if model_files:
         st.dataframe(pd.DataFrame(model_files), use_container_width=True, hide_index=True)
     else:
