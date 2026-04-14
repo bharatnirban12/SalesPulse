@@ -11,11 +11,12 @@ from src.pipeline.router import ModelRouter
 
 
 class ForecastEngine:
-    def __init__(self):
-        self.router = ModelRouter()
-        self.feature_builder = FeatureBuilder()
+    def __init__(self, feature_builder=None, router=None):
 
-    # SINGLE FORECAST (for API /forecast)
+        self.router = router if router is not None else ModelRouter()
+        self.feature_builder = feature_builder if feature_builder is not None else FeatureBuilder()
+
+    # SINGLE FORECAST
     def forecast(self, store_nbr, family, start_date, weeks=1):
 
         days = weeks * 7

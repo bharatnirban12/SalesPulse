@@ -16,10 +16,9 @@ from src.utils.confidence import add_confidence_intervals
 # Initialize app
 app = FastAPI()
 
-# Initialize pipelines
 feature_builder = FeatureBuilder()
-forecast_engine = ForecastEngine()
 router = ModelRouter()
+forecast_engine = ForecastEngine(feature_builder=feature_builder, router=router)
 
 # Home endpoint
 @app.get("/")
@@ -88,7 +87,7 @@ def get_batch_forecast(data: BatchForecastInput):
             
             df["date"] = df["date"].dt.strftime("%Y-%m-%d")
 
-        # Apply limiting
+        # Applying  limits
         if not data.summary and len(df) > data.limit:
             df = df.head(data.limit)
 

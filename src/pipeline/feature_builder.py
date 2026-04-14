@@ -5,9 +5,25 @@ import numpy as np
 class FeatureBuilder:
     def __init__(self):
         self.data_path = "data/processed/featured_data.csv.zip"
-        self.df = pd.read_csv(self.data_path)
-        self.df["date"] = pd.to_datetime(self.df["date"])
+        self.df = self._load_optimized()
         self.global_min_date = self.df["date"].min()
+
+    def _load_optimized(self):
+        df = pd.read_csv(self.data_path)
+        df["date"] = pd.to_datetime(df["date"])
+
+        for col in df.select_dtypes(include=["float64"]).columns:
+            df[col] = df[col].astype("float32")
+
+        for col in df.select_dtypes(include=["int64"]).columns:
+            df[col] = df[col].astype("int16")
+
+        # Low-cardinality string columns benefit greatly from category dtype
+        for col in df.select_dtypes(include=["object"]).columns:
+            if df[col].nunique() < 200:
+                df[col] = df[col].astype("category")
+
+        return df
 
     def get_history(self, store_nbr, family):
         df = self.df[
@@ -66,29 +82,22 @@ class FeatureBuilder:
         rolling_mean_14 = rolling_mean(14)
         rolling_mean_30 = rolling_mean(30)
 
-        # Take the last historical row — it already has ALL columns the model needs
-        # (city, state, cluster, transactions, type, locale, etc.)
-        # We only overwrite the features that change per prediction date.
         feature_row = history.iloc[-1:].copy()
 
-        # Drop target and date columns (model doesn't use them)
         drop_cols = [c for c in ["sales", "date"] if c in feature_row.columns]
         feature_row = feature_row.drop(columns=drop_cols)
 
-        # Overwrite time features for the new prediction date
         feature_row["day_of_week"]  = day_of_week
         feature_row["day_of_month"] = day_of_month
         feature_row["week_of_year"] = week_of_year
         feature_row["time_index"]   = time_index
         feature_row["is_weekend"]   = is_weekend
 
-        # Handle monthx vs month column name (typo in feature_engineering.py)
         if "monthx" in feature_row.columns:
             feature_row["monthx"] = month
         elif "month" in feature_row.columns:
             feature_row["month"] = month
 
-        # Overwrite lag and rolling features
         feature_row["dales_lag_1"]     = dales_lag_1
         feature_row["dales_lag_7"]     = dales_lag_7
         feature_row["dales_lag_14"]    = dales_lag_14
