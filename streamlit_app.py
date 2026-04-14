@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import yaml
 import requests
 
-API_BASE_URL = "http://127.0.0.1:8000/api"
+API_BASE_URL = "https://sales-pulse-api.onrender.com/api"
 
 # ──────────────────────────────────────────
 # PAGE CONFIG
